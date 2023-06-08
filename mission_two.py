@@ -24,11 +24,12 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Insert five books into the 'books' table
-book1 = Book(title='Animal Farm', author='Author 1', description='Description 1', year_published=1945)
-book2 = Book(title='The Secret', author='Author 2', description='Description 2', year_published=2016)
-book3 = Book(title='the old man and the sea', author='Author 3', description='Description 3', year_published=1952)
-book4 = Book(title='it ends with us', author='Author 4', description='Description 4', year_published=2019)
-book5 = Book(title='Stranger in a strange land', author='Author 5', description='Description 5', year_published=2018)
+book1 = Book(title='Animal Farm', author='jorge orwell', description='Description 1', year_published=1945)
+book2 = Book(title='The Secret', author='Rhonda Byrne', description='Description 2', year_published=2016)
+book3 = Book(title='the old man and the sea', author='Ernest Hemingway', description='Description 3', year_published=1952)
+book4 = Book(title='it ends with us', author='Colleen Hoover', description='Description 4', year_published=2019)
+book5 = Book(title='Stranger in a strange land', author='Robert A. Heinlein', description='Description 5', year_published=2018)
+
 
 session.add_all([book1, book2, book3, book4, book5])
 session.commit()
