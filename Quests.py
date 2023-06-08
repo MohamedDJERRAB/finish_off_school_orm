@@ -1,8 +1,10 @@
 #In[]
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from typing import List, Optional
 from sqlalchemy.orm import DeclarativeBase, Session, Mapped, mapped_column, relationship
 
+
+#In[]
 
 # creating an Engine to connect to our database, the databse is in-memory-only (temporary database)
 Alexandria_library = create_engine("sqlite+pysqlite:///:memory:", echo=True)
@@ -46,6 +48,37 @@ with Session(Alexandria_library) as session:
 
     session.add_all([b1, b2, b3, b4, b5])
     session.commit()
+
+
+
+#In[]
+
+# selecting a book by its author name
+with Session(Alexandria_library) as session:
+    stmnt = select(Books).where(Books.author.is_("Al Boukhari"))
+    for res in session.scalars(stmnt):
+        print(res)
+        pass
+
+#In[]
+# changing a book's description
+with Session(Alexandria_library) as session:
+    stmnt = select(Books).where(Books.author.is_("J. R. R. Tolkien"))
+    LR = session.scalars(stmnt).one()
+
+    LR.description = "A classical sword & magic Adventure, turned into a fan favorite movie series"
+    session.commit()
+
+
+#In[]
+# deleting a book
+with Session(Alexandria_library) as session:
+    stmnt = select(Books).where(Books.author.is_("Charles Dickens"))
+    Tale_of_two_cities = session.scalars(stmnt).one()
+    session.delete(Tale_of_two_cities)
+    session.commit()
+
+
 
 
 # %%
