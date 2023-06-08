@@ -9,6 +9,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy import ForeignKey
 from m1 import engine
 
 class Base(DeclarativeBase):
@@ -24,6 +25,21 @@ class Book(Base):
 
     def __repr__(self) -> str:
         return f"Book(id={self.id!r}, Title={self.title!r}, Author={self.author!r}, Description={self.description!r}, Year published={self.year_published!r})"
+    
+class Category(Base):
+    __tablename__ = "category"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
+    def __repr__(self) -> str:
+        return f"Category(id={self.id!r}, Name={self.name!r})"
+    
+# class BookCategory(Base):
+#     __tablename__ = "book categories"
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     book_id: Mapped[int] = mapped_column(ForeignKey(Book.id))
+#     category_id: Mapped[int] = mapped_column(Category.id)
+#     def __repr__(self) -> str:
+#         return f"Book category(book id={self.book_id!r}, category id={self.category_id!r})"
     
 Base.metadata.create_all(engine)
 
@@ -69,7 +85,30 @@ with Session(engine) as session:
         description="Gödel, Escher, Bach: an Eternal Golden Braid, also known as GEB, is a 1979 book by Douglas Hofstadter. By exploring common themes in the lives and works of logician Kurt Gödel, artist M. C. Escher, and composer Johann Sebastian Bach, the book expounds concepts fundamental to mathematics, symmetry, and intelligence.",
         year_published ="1979"
     )
-    
+    category1 = Category(
+        id = 0,
+        name = "fiction"
+    )
+    category2 = Category(
+        id = 1,
+        name = "logic"
+    )
+    # book_category1 = BookCategory(
+    #     id = 0,
+    #     book_id = 0,
+    #     category_id = 1
+    # )
+    # book_category2 = BookCategory(
+    #     id = 0,
+    #     book_id = 0,
+    #     category_id = 1
+    # )
+
     books = session.add_all([book1, book2, book3, book4, book5])
     session.commit()
 
+    categories = session.add_all([category1, category2])
+    session.commit()
+
+    # book_categories = session.add_all([book_category1])
+    # session.commit()
