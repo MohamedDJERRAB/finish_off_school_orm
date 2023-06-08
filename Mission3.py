@@ -8,3 +8,7 @@ session = Session()
 
 retrieve_author = session.query().filter(Book.author == 'ghania')
 
+for r in retrieve_author:
+    print(r)
+
+delete = session.query
