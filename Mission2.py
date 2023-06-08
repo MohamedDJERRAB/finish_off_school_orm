@@ -1,12 +1,10 @@
-from sqlalchemy import Column, String, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import ForeignKey, Column, String, Integer
+from sqlalchemy.orm import declarative_base, sessionmaker
 from Mission1 import engine
 
 # The Library of Alexandria & Filling the Shelves
 
 Base = declarative_base()
-
 
 class Book(Base):
     __tablename__ = "books"
@@ -16,16 +14,17 @@ class Book(Base):
     description = Column(String)
     year_published = Column(Integer)
 
-    def __init__(self, id, title, author, description, year_published):
-        self.id = id
-        self.title = title
-        self.author = author
-        self.description = description
-        self.year_published = year_published
 
-    def __repr__(self):
-        return f"({self.id})({self.title})({self.author})({self.description})({self.year_published})"
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
 
+
+class BookCategory(Base):
+    __tablename__ = "book_categories"
+    book_id = Column(Integer, ForeignKey("books.id"), primary_key=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), primary_key=True)
 
 Base.metadata.create_all(bind=engine)
 
