@@ -7,6 +7,8 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeBase, Session,joinedload
 from mission_3 import delete_book,update_book,select_book_author
+from sqlalchemy import func
+from mission_5 import category_old_books
 
 #create a new databse data
 engine = create_engine('sqlite:///alexandria.db', echo=True)
@@ -63,6 +65,7 @@ with Session(engine) as session:
             {"book_id":520,"author":"Laura Mitchell","title":"The Secret Garden of Dreams","description":"A heartwarming tale about a young girl who discovers a magical garden that brings hope and healing to all who enter.","year":2009},
             {"book_id":50,"author":"Laura Mitchell","title":"The Secret Garden of Dreams","description":"A heartwarming tale about a young girl who discovers a magical garden that brings hope and healing to all who enter.","year":2009},
             {"book_id":16,"author":"Laura","title":"The Secret Garden of Dreams","description":"A heartwarming tale about a young girl who discovers a magical garden that brings hope and healing to all who enter.","year":2009},
+            {"book_id":18,"author":"Laura","title":"The Secret Garden of Dreams","description":"A heartwarming tale about a young girl who discovers a magical garden that brings hope and healing to all who enter.","year":2010},
         ],
     )
     session.commit()
@@ -78,8 +81,11 @@ with Session(engine) as session:
     book_category = book_categories(book_id=520, category_id=1)  
     session.add(book_category)
     session.commit()
+    book_category2 = book_categories(book_id=18, category_id=1) 
+    session.add(book_category2)
+    session.commit()
 
-#list all books withis a specific category
+#list all books within a specific category
 with Session(engine) as session:
     books = session.query(Book).join(Book.categories).filter(Categories.id == 1).options(joinedload(Book.categories)).all()
     for book in books:
@@ -92,4 +98,8 @@ with Session(engine) as session:
         for category in book.categories:
             print(f"- {category.name}")
         print("------")
-        
+
+
+# find oldest year book for each category
+with Session(engine) as session:
+    category_old_books(session,Book,Categories,book_categories)
