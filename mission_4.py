@@ -1,10 +1,11 @@
+from sqlalchemy.orm import relationship, backref
 import select
 import sqlalchemy
-from sqlalchemy import create_engine, insert
+from sqlalchemy import ForeignKey, create_engine, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import DeclarativeBase, Session
+from sqlalchemy.orm import DeclarativeBase, Session,joinedload
 from mission_3 import delete_book,update_book,select_book_author
 
 #create a new databse data
@@ -23,11 +24,32 @@ class Book(Base):
     title = Column(String)
     description= Column(String)
     year=Column(Integer)
-
+    categories = relationship(
+        "Categories", secondary="book_categories", back_populates="books"
+    )
     def __repr__(self) -> str:
         return f"Book(id={self.id}, title={self.title}, author={self.author}, description={self.description}, year_published={self.year_published})"
 
+#create categories table
+class Categories(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    books = relationship(
+        "Book", secondary="book_categories", back_populates="categories"
+    )
+    def __repr__(self) -> str:
+        return f"Categories(id={self.id}, name={self.name})"
 
+# book_categorie table
+class book_categories(Base):
+    __tablename__ = "book_categories"
+    book_id= Column(Integer, ForeignKey(Book.book_id),primary_key=True)
+    category_id = Column(Integer, ForeignKey(Categories.id),primary_key=True)
+    def __repr__(self) -> str:
+        return f"book_categories(id={self.book_id},category_id={self.category_id})"
+    
+#create tables
 Base.metadata.create_all(engine)
 
 
@@ -45,15 +67,29 @@ with Session(engine) as session:
     )
     session.commit()
 
-#select book author
-with Session(engine) as session:
-    select_book_author(session,Book,"Laura")
+#inserting  category
 
-#delete book
 with Session(engine) as session:
-    delete_book(session,Book,16)
+    category = Categories(id=1,name="fiction")
+    session.add(category)
+    session.commit()
 
-#update Book
 with Session(engine) as session:
-    update_book(session,Book,50,"new Description")
+    book_category = book_categories(book_id=520, category_id=1)  
+    session.add(book_category)
+    session.commit()
 
+#list all books withis a specific category
+with Session(engine) as session:
+    books = session.query(Book).join(Book.categories).filter(Categories.id == 1).options(joinedload(Book.categories)).all()
+    for book in books:
+        print(f"Book ID: {book.book_id}")
+        print(f"Title: {book.title}")
+        print(f"Author: {book.author}")
+        print(f"Description: {book.description}")
+        print(f"Year: {book.year}")
+        print("Categories:")
+        for category in book.categories:
+            print(f"- {category.name}")
+        print("------")
+        
