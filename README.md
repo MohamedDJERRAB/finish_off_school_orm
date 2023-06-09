@@ -1,3 +1,6 @@
+Note : avant d'exécuter  mission 3 il suffit de metre les lignes 34 et 35 en commentaire pour que y'aura pas une erreur de ré-insertion 
+
+
 # Course: 🚀 Embark on the Database Journey with SQLAlchemy 📚
 
 ## 💻 Requirements
