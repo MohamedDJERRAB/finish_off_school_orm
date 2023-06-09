@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeBase, Session
 from sqlalchemy.orm import sessionmaker
+from mission_3 import delete_book,update_book,select_book_author
 
 #create a new databse data
 engine = create_engine('sqlite:///alexandria.db', echo=True)
@@ -45,4 +46,15 @@ with Session(engine) as session:
     )
     session.commit()
 
+#select book author
+with Session(engine) as session:
+    select_book_author(session,Book,"Laura")
+
+#delete book
+with Session(engine) as session:
+    delete_book(session,Book,16)
+
+#update Book
+with Session(engine) as session:
+    update_book(session,Book,50,"new Description")
 
