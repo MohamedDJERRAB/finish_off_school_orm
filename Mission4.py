@@ -1,8 +1,7 @@
-from sqlalchemy import ForeignKey, Column, String, Integer
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from Mission1 import engine
 
-# The Library of Alexandria & Filling the Shelves
 Base = declarative_base()
 
 class Book(Base):
@@ -12,11 +11,13 @@ class Book(Base):
     author = Column(String)
     description = Column(String)
     year_published = Column(Integer)
+    categories = relationship("Category", secondary="book_categories", back_populates="books")
 
 class Category(Base):
     __tablename__ = "categories"
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    books = relationship("Book", secondary="book_categories", back_populates="categories")
 
 class BookCategory(Base):
     __tablename__ = "book_categories"
@@ -34,5 +35,29 @@ b5 = Book(title="Hut 8 and the naval Enigma", author="alan turing", description=
 Session = sessionmaker(bind=engine)
 session = Session()
 session.add_all([b1, b2, b3, b4, b5])
+
+# Create a 'Fantasy' category and associate the books with it
+fantasy_category = Category(name='Fantasy')
+fantasy_category.books.extend([b1, b2, b3, b4, b5])
+
+session.add(fantasy_category)
 session.commit()
+
+# Query books in the 'Fantasy' category
+category_name = 'Fantasy'
+category = session.query(Category).filter_by(name=category_name).first()
+
+if category:
+    books = category.books
+
+    print(f"Books in the '{category_name}' category:")
+    for book in books:
+        print("Title:", book.title)
+        print("Author:", book.author)
+        print("Description:", book.description)
+        print("Year Published:", book.year_published)
+        print()
+else:
+    print(f"No category found with the name '{category_name}'.")
+
 session.close()
